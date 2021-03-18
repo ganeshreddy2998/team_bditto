@@ -1,0 +1,180 @@
+{% extends "home_page.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.js"></script>
+
+<style>
+  .select,
+  #locale {
+    width: 100%;
+  }
+  .like {
+    margin-right: 10px;
+  }
+
+  .fixed-table-pagination{
+      padding-left:50px !important;
+      font-weight:600;
+      padding-right:30px !important;
+  }
+
+  .fixed-table-toolbar{
+      padding-right:30px !important;
+  }
+
+  .table-header-left{
+    text-transform: uppercase;
+    color: rgba(13,27,62,0.7);
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .clickable-row{
+      cursor: pointer !important;
+  }
+  
+  /* table *{
+      background-color: white;
+  } */
+
+</style>
+
+<div class="app-main__inner" >
+    <div class="row">
+        <div class="col-xl-12" >
+            <div class="main-card mb-3 card" style="padding:40px;position:relative;">
+
+                <span style="position:absolute; top:10px;right:25px;cursor:pointer;" >
+                    <button type="button" class="btn btn-success" onclick="changeStatus();">
+                        Save <i class="metismenu-icon pe-7s-back"></i>
+                    </button>
+                </span>
+
+                <h3>Reported by</h3>
+                    <hr>
+                <div class="row">
+                    <div class="col-xl-4">
+                        <div class="main-card mb-3 card" >
+                            {% if issue.user_associated.avatar %}
+                                <img height="362" class="profile-avatar-card"
+                                    src="/media/{{ issue.user_associated.avatar }}" alt="">
+                            {% else %}
+                                <img height="362" class="profile-avatar-card"
+                                    src="{% static 'images/dummy.jpg' %}" alt="">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-xl-8" >
+                        <table >
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <b>Username :</b> 
+                                    </td>
+                                    <td>
+                                        {{ issue.user_associated.user.username }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Email :</b> 
+                                    </td>
+                                    <td>
+                                        {{ issue.user_associated.user.email }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Full name :</b> 
+                                    </td>
+                                    <td>
+                                        {{ issue.user_associated.full_name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Title :</b> 
+                                    </td>
+                                    <td>
+                                        {{ issue.title }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Description :</b> 
+                                    </td>
+                                    <td>
+                                        {{ issue.description }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Reported on :</b> 
+                                    </td>
+                                    <td>
+                                        {{ issue.reported_on }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Status :</b> 
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'ChangeIssueStatus' %}" method='POST' id="issue_status_change_form">
+                                            {% csrf_token %}
+                                            <input type="text" hidden name="issue_id" value="{{ issue.pk }}" >
+                                            <select name="issue_status" id="issue_select_drop" >
+                                                <option value="pending">Pending</option>
+                                                <option value="resolved">Resolved</option>
+                                                <option value="discarded">Discarded</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+    });
+    
+</script>
+
+<script>
+    document.getElementById('issues-menu-head').className = 'mm-active';
+
+    document.getElementById('issue_select_drop').value = '{{ issue.status }}';
+
+    function changeStatus() {
+        $('#issue_status_change_form').submit();
+    }
+
+</script>
+
+{% endblock %}

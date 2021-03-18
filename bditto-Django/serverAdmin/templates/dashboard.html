@@ -1,0 +1,604 @@
+{% extends "home_page.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    .clickable-row {
+        cursor: pointer !important;
+    }
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
+<div class="app-main__inner">
+    <div class="row">
+        <div class="col-md-12 col-lg-12">
+            <div class="mb-3 card">
+                <div class="card-header-title" style="text-align: center; font-size: 1.2rem; color: chocolate;">
+                    <p><b>Users Registered per month/ per day</b></p>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <select id="this">
+                            <option value="M" selected="selected">Monthly</option>
+                            <option value="D">Daily</option>
+                        </select>
+                        <input type="date" id="user_date" name="user_date" value="{{todays_date}}">
+
+                        <div class="input-group-append">
+                            <button id="submit" class="btn btn-primary">Submit</button>
+                        </div>
+
+                        <canvas id="user-chart" data-url="{% url 'user_chart' %}"></canvas>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   <div class="row">
+        <div class="col-md-12 col-lg-12">
+            <div class="mb-3 card">
+                <div class="card-header-title" style="text-align: center; font-size: 1.2rem; color: chocolate;">
+                    <p><b>Status Created per month/ per day</b></p>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <select id="that">
+                            <option value="M" selected="selected">Monthly</option>
+                            <option value="D">Daily</option>
+                        </select>
+                        <input type="date" id="status_date" name="status_date" value="{{todays_date}}">
+                        <div class="input-group-append">
+                            <button id="submits" class="btn btn-primary">Submit</button>
+                        </div>
+                        <canvas id="status-chart" data-url="{% url 'status_created_graph' %}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content bg-midnight-bloom">
+                <div class="widget-content-wrapper text-white">
+                    <div class="widget-content-left">
+                        <div class="widget-heading">Users</div>
+                        <div class="widget-subheading">Total active users</div>
+                    </div>
+                    <div class="widget-content-right">
+                        <div class="widget-numbers text-white"><span>{{ total_active_users }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content bg-arielle-smile">
+                <div class="widget-content-wrapper text-white">
+                    <div class="widget-content-left">
+                        <div class="widget-heading">Status</div>
+                        <div class="widget-subheading">Total Active/Inactive status</div>
+                    </div>
+                    <div class="widget-content-right">
+                        <div class="widget-numbers text-white"><span>{{ total_status }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content bg-grow-early">
+                <div class="widget-content-wrapper text-white">
+                    <div class="widget-content-left">
+                        <div class="widget-heading">Issues</div>
+                        <div class="widget-subheading">Pending Issues</div>
+                    </div>
+                    <div class="widget-content-right">
+                        <div class="widget-numbers text-white"><span>{{ total_issues_pending }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xl-3">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Active users</div>
+                            <div class="widget-subheading">active users</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-success">{{ total_active_users }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Deactivated users</div>
+                            <div class="widget-subheading">Partially blocked</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-warning">{{ total_deactive_users }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Blocked Users</div>
+                            <div class="widget-subheading">completely blocked</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-danger">{{ total_blocked_users }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Deleted Users</div>
+                            <div class="widget-subheading">Not a member now</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-danger">{{ total_deleted_users }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="main-card mb-3 card">
+                <div class="card-header">Recently Registered Users
+                </div>
+                <div class="table-responsive">
+                    <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Username</th>
+                                <th class="text-center">Name</th>
+                                <th class="text-center">Country</th>
+                                <th class="text-center">City</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rec_user in recently_joined_users %}
+                            <tr class='clickable-row' data-href="{% url 'UserDetailPage' slug=rec_user.slug %}">
+                                <td class="text-center text-muted">#{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="widget-content p-0">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left mr-3">
+                                                <div class="widget-content-left">
+                                                    {% if rec_user.avatar %}
+                                                    <img width="40" class="rounded-circle" src="/media/{{ rec_user.avatar}}" alt="">
+                                                    {% else %}
+                                                    <img width="40" class="rounded-circle" src="{% static 'images/dummy.jpg' %}" alt="">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="widget-content-left flex2">
+                                                <div class="widget-heading">{{ rec_user.user.username }}</div>
+                                                <div class="widget-subheading opacity-7">{{ rec_user.user.email }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ rec_user.full_name }}</td>
+                                <td class="text-center">
+                                    {{ rec_user.country }}
+                                </td>
+                                <td class="text-center">
+                                    {{ rec_user.city }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-block text-center card-footer">
+                    <a href="{% url 'ActiveUsers' %}">
+                        <button class="btn-wide btn btn-primary">Show all</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Active status</div>
+                            <div class="widget-subheading">active status</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-success">{{ total_active_status }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Inactive status</div>
+                            <div class="widget-subheading">inactive status</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-warning">{{ total_inactive_status }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Deleted Status</div>
+                            <div class="widget-subheading">not available for users</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-danger">{{ total_blocked_status }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="main-card mb-3 card">
+                <div class="card-header">Recently created status
+                </div>
+                <div class="table-responsive">
+                    <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Author</th>
+                                <th>Content</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Created on</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for status in recently_created_status %}
+                            <tr class='clickable-row' data-href="{% url 'StatusDetailPage' slug=status.slug %}">
+                                <td class="text-center text-muted">#{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="widget-content p-0">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left mr-3">
+                                                <div class="widget-content-left">
+                                                    {% if status.author.avatar %}
+                                                    <img width="40" class="rounded-circle" src="/media/{{ status.author.avatar }}" alt="">
+                                                    {% else %}
+                                                    <img width="40" class="rounded-circle" src="{% static 'images/dummy.jpg' %}" alt="">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="widget-content-left flex2">
+                                                <div class="widget-heading">{{ status.author.full_name }}</div>
+                                                <div class="widget-subheading opacity-7">{{ status.author.user.username }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ status.content }}</td>
+                                <td class="text-center">
+                                    {{ status.current_status }}
+                                </td>
+                                <td class="text-center">
+                                    {{ status.created_at }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-block text-center card-footer">
+                    <a href="{% url 'ActiveStatus' %}">
+                        <button class="btn-wide btn btn-primary">Show all</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Pending Issues</div>
+                            <div class="widget-subheading">issues that are not resolved</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-success">{{ total_issues_pending }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Resolved Issues</div>
+                            <div class="widget-subheading">resolved issues</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-warning">{{ total_resolved_issues }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card mb-3 widget-content">
+                <div class="widget-content-outer">
+                    <div class="widget-content-wrapper">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Discarded Issues</div>
+                            <div class="widget-subheading">invalid issues</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-danger">{{ total_discarded_issues }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="main-card mb-3 card">
+                <div class="card-header">Recently posted Issues
+                </div>
+                <div class="table-responsive">
+                    <table data-toggle="table" class="align-middle mb-0 table table-borderless table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Reported by</th>
+                                <th class="text-center">Title</th>
+                                <th>Description</th>
+                                <th class="text-center">Reported on</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for issue in recent_issues %}
+                            <tr class='clickable-row' data-href="{% url 'IssuesDetailView' slug=issue.slug %}">
+                                <td class="text-center text-muted">#{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="widget-content p-0">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left mr-3">
+                                                <div class="widget-content-left">
+                                                    {% if issue.user_associated.avatar %}
+                                                    <img width="40" class="rounded-circle" src="/media/{{ issue.user_associated.avatar }}" alt="">
+                                                    {% else %}
+                                                    <img width="40" class="rounded-circle" src="{% static 'images/dummy.jpg' %}" alt="">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="widget-content-left flex2">
+                                                <div class="widget-heading">{{ issue.user_associated.full_name }}</div>
+                                                <div class="widget-subheading opacity-7">{{ issue.user_associated.user.username }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ issue.title }}</td>
+                                <td>
+                                    {{ issue.description }}
+                                </td>
+                                <td class="text-center">
+                                    {{ issue.reported_on }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-block text-center card-footer">
+                    <a href="{% url 'PendingIssues' %}">
+                        <button class="btn-wide btn btn-primary">Show all</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+    var submit = document.getElementById("submit")
+    submit.onclick = function() {
+        var date = document.getElementById("user_date")
+        var choice = document.getElementById("this")
+        var data = {
+            "date": date.value,
+            "type": choice.value,
+        }
+        console.log(data);
+        var $userChart = $("#user-chart");
+        console.log($userChart)
+        $.ajax({
+            url: $userChart.data("url"),
+            data: data,
+            success: function(data) {
+
+                var ctx = $userChart[0].getContext("2d");
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'User Registering',
+                            backgroundColor: 'blue',
+                            data: data.data
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'User Registered Bar Chart'
+                        }
+                    }
+                });
+
+            }
+        });
+
+    }
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+   
+</script>
+<script>
+    jQuery(document).ready(function($) {
+
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+        console.log("start");
+        
+            var submit = document.getElementById("submit")
+        var date = document.getElementById("user_date")
+        var choice = document.getElementById("this")
+        var data = {
+            "date": date.value,
+            "type": choice.value,
+        }
+        console.log(data);
+        var $userChart = $("#user-chart");
+        console.log($userChart)
+        $.ajax({
+            url: $userChart.data("url"),
+            data: data,
+            success: function(data) {
+
+                var ctx = $userChart[0].getContext("2d");
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'User Registering',
+                            backgroundColor: 'blue',
+                            data: data.data
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'User Registered Bar Chart'
+                        }
+                    }
+                });
+
+            }
+        });
+        
+        
+         var submit = document.getElementById("submits")
+        var date = document.getElementById("status_date")
+        var choice = document.getElementById("that")
+        var data = {
+            "date": date.value,
+            "type": choice.value,
+        }
+        console.log(data);
+        var $statusChart = $("#status-chart");
+        console.log($statusChart)
+        $.ajax({
+            url: $statusChart.data("url"),
+            data: data,
+            success: function(data) {
+
+                var ctx = $statusChart[0].getContext("2d");
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'status created',
+                            backgroundColor: 'blue',
+                            data: data.data
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'status created Bar Chart'
+                        }
+                    }
+                });
+
+            }
+        });
+     
+        
+    });
+    
+    
+
+</script>
+
+<script>
+    document.getElementById('dashboard-menu').className += ' mm-active';
+    document.getElementById('users-menu-head').className = 'mm-active';
+
+</script>
+
+{% endblock %}

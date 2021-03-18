@@ -1,0 +1,334 @@
+{% extends "home_page.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.js"></script>
+
+<style>
+    .select,
+    #locale {
+        width: 100%;
+    }
+
+    .like {
+        margin-right: 10px;
+    }
+
+    .fixed-table-pagination {
+        padding-left: 50px !important;
+        font-weight: 600;
+        padding-right: 30px !important;
+    }
+
+    .fixed-table-toolbar {
+        padding-right: 30px !important;
+    }
+
+    .table-header-left {
+        text-transform: uppercase;
+        color: rgba(13, 27, 62, 0.7);
+        font-weight: bold;
+        font-size: 1.2rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .widget-content {
+        align-items: flex-start !important;
+    }
+
+    .widget-content-wrapper {
+        width: 100%;
+    }
+
+    .modal {
+        z-index: 1050 !important;
+    }
+
+    /* table *{
+      background-color: white;
+  } */
+
+</style>
+
+<div class="app-main__inner">
+    <div class="row">
+        <div class="col-xl-4 col-sm-6">
+            <div class="main-card mb-1 card">
+                {% if status.author.avatar %}
+                <img height="181" class="profile-avatar-card" src="/media/{{ status.author.avatar }}" alt="">
+                {% else %}
+                <img height="181" class="profile-avatar-card" src="{% static 'images/dummy.jpg' %}" alt="">
+                {% endif %}
+            </div>
+
+            <div class="main-card mb-3 card">
+                {% if status.background_image %}
+                <img height="181" class="profile-avatar-card" src="/media/{{ status.background_image }}" alt="">
+                {% else %}
+                <img height="181" class="profile-avatar-card" src="{% static 'images/dummy.jpg' %}" alt="">
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-xl-8 col-sm-6">
+            <div class="row">
+                <div class="col-md-6 col-xl-6">
+                    <div class="card mb-3 widget-content bg-success">
+                        <div class="widget-content-wrapper text-white">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Participants</div>
+                                <div class="widget-subheading">number of users in the group</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers text-white"><span>{{ tp }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-6">
+                    <div class="card mb-3 widget-content bg-danger">
+                        <div class="widget-content-wrapper text-white">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Hashtags</div>
+                                <div class="widget-subheading">number of hashtags used</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers text-white"><span>{{ num_hashtags }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-card mb-3 card" style="padding:20px;position:relative;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <b>Author :</b>
+                            </td>
+                            <td>
+                                {{ status.author.full_name }}
+                                <a href="{% url 'UserDetailPage' slug=status.author.slug %}">
+                                    <i class="fas fa-link"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Content :</b>
+                            </td>
+                            <td>
+                                {{ status.content }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Background color :</b>
+                            </td>
+                            <td>
+                                {{ status.background_color }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Created at :</b>
+                            </td>
+                            <td>
+                                {{ status.created_at }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Hashtags :</b>
+                            </td>
+                            <td style="color:royalblue;text-decoration: underline;">
+                                {% for hashtag in status.hashtags.all %}
+                                #{{ hashtag.name }},
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Current Status :</b>
+                            </td>
+                            <td>
+                                {% if status.current_status == 'deleted' %}
+                                Deleted
+                                {% else %}
+                                <form action="{% url 'ChangeStatusStatus' %}" method='POST' id="user_status_change_form">
+                                    {% csrf_token %}
+                                    <input type="text" hidden name="status_id" value="{{ status.pk }}">
+                                    <button class="btn btn-danger" type="submit">Delete status</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Files : </b>
+                            </td>
+                            <td>
+                                {% for file in status.statusFiles.all %}
+                                <a href="/media/{{ file.file }}" download>
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <a href="/media/{{ file.file }}" target="_blank">{{ file.file }}</a> <br>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-lg-12">
+            <div class="mb-3 card">
+                <div class="card-header-title" style="text-align: center; font-size: 1.2rem; color: chocolate;">
+                    <p><b>Status Created per month/ per day</b></p>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <select id="this">
+                            <option value="M" selected="selected">Monthly</option>
+                            <option value="D">Daily</option>
+                        </select>
+                        <input type="date" id="status_date" name="status_date" value="{{todays_date}}">
+                        <div class="input-group-append">
+                            <button id="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                        <canvas id="population-chart" data-url="{% url 'population-chart' %}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+    var submit = document.getElementById("submit")
+    submit.onclick = function() {
+        var date = document.getElementById("status_date")
+        var choice = document.getElementById("this")
+        var data = {
+            "date": date.value,
+            "type": choice.value,
+            "status": {{status.id}},
+        }
+        console.log(data);
+        var $populationChart = $("#population-chart");
+        console.log($populationChart)
+        $.ajax({
+            url: $populationChart.data("url"),
+            data: data,
+            success: function(data) {
+
+                var ctx = $populationChart[0].getContext("2d");
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'User Joining',
+                            backgroundColor: 'blue',
+                            data: data.data
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'User Joined Bar Chart'
+                        }
+                    }
+                });
+
+            }
+        });
+
+    }
+
+</script>
+<script>
+    var k = `<div class="table-header-left">Created Status</div>`;
+
+    $(document).ready(function() {
+        $(".fixed-table-toolbar").append(k);
+        
+         var submit = document.getElementById("submit")
+        var date = document.getElementById("status_date")
+        var choice = document.getElementById("this")
+        var data = {
+            "date": date.value,
+            "type": choice.value,
+            "status": status.id,
+        }
+        console.log(data);
+        var $populationChart = $("#population-chart");
+        console.log($populationChart)
+        $.ajax({
+            url: $populationChart.data("url"),
+            data: data,
+            success: function(data) {
+
+                var ctx = $populationChart[0].getContext("2d");
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'User Joining',
+                            backgroundColor: 'blue',
+                            data: data.data
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'User Joined Bar Chart'
+                        }
+                    }
+                });
+
+            }
+        });
+
+
+        
+    });
+
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+    });
+
+</script>
+
+{% endblock %}

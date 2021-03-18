@@ -1,0 +1,164 @@
+{% extends "home_page.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/bootstrap-table@1.17.1/dist/bootstrap-table.min.js"></script>
+
+<style>
+  .select,
+  #locale {
+    width: 100%;
+  }
+  .like {
+    margin-right: 10px;
+  }
+
+  .fixed-table-pagination{
+      padding-left:50px !important;
+      font-weight:600;
+      padding-right:30px !important;
+  }
+
+  .fixed-table-toolbar{
+      padding-right:30px !important;
+  }
+
+  .table-header-left{
+    text-transform: uppercase;
+    color: rgba(13,27,62,0.7);
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .clickable-row{
+      cursor: pointer !important;
+  }
+  
+  /* table *{
+      background-color: white;
+  } */
+
+</style>
+
+<div class="app-main__inner" >
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="main-card mb-3 card">
+                <!-- <div class="card-header">Recently Registered Users
+                </div> -->
+                <div class="table-responsive">
+                    <table
+                        id="table"
+                        data-toggle="table"
+                        data-pagination="true"
+                        data-search="true"
+                        class="align-middle mb-0 table table-borderless table-striped table-hover"
+                        style="padding:10px !important;"
+                        >
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Reported by</th>
+                                <th>User Reported</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Reported on</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for re_user in reported_users %}
+                            <tr>
+                                <td class="text-center text-muted">#{{ forloop.counter }}</td>
+                                <td class='clickable-row' data-href="{% url 'ReportUserPage' slug=re_user.slug %}">
+                                    <div class="widget-content p-0">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left mr-3">
+                                                <div class="widget-content-left">
+                                                    {% if re_user.reported_by.avatar %}
+                                                        <img width="40" class="rounded-circle"
+                                                            src="/media/{{ re_user.reported_by.avatar}}" alt="">
+                                                    {% else %}
+                                                        <img width="40" class="rounded-circle"
+                                                            src="{% static 'images/dummy.jpg' %}" alt="">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="widget-content-left flex2">
+                                                <div class="widget-heading">{{ re_user.reported_by.full_name }}</div>
+                                                <div class="widget-subheading opacity-7">{{ re_user.reported_by.user.email }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class='clickable-row' data-href="{% url 'UserDetailPage' slug=re_user.user_reported.slug %}" >
+                                    <div class="widget-content p-0">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left mr-3">
+                                                <div class="widget-content-left">
+                                                    {% if re_user.user_reported.avatar %}
+                                                        <img width="40" class="rounded-circle"
+                                                            src="/media/{{ re_user.user_reported.avatar}}" alt="">
+                                                    {% else %}
+                                                        <img width="40" class="rounded-circle"
+                                                            src="{% static 'images/dummy.jpg' %}" alt="">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="widget-content-left flex2">
+                                                <div class="widget-heading">{{ re_user.user_reported.full_name }}</div>
+                                                <div class="widget-subheading opacity-7">{{ re_user.user_reported.user.email }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {{ re_user.status }}
+                                </td>
+                                <td class="text-center">
+                                    {{ re_user.reported_on }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    <div class="table-responsive">
+        
+    </div>
+
+</div>
+
+<script>
+    var k = `<div class="table-header-left">List of Reported Users</div>`;
+
+    $(document).ready(function(){
+        $(".fixed-table-toolbar").append(k);
+    });
+
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+    });
+    
+</script>
+
+<script>
+    document.getElementById('reported-users-menu').className += ' mm-active';
+    document.getElementById('users-menu-head').className = 'mm-active';
+</script>
+
+{% endblock %}
